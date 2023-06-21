@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:galleryimage/app_cached_network_image.dart';
+import 'package:photo_view/photo_view.dart';
 
 import 'gallery_item_model.dart';
 
@@ -11,31 +13,23 @@ class GalleryImageViewWrapper extends StatefulWidget {
   final String? titleGallery;
   final Widget? loadingWidget;
   final Widget? errorWidget;
-  final double minScale;
-  final double maxScale;
   final double radius;
   final bool reverse;
-  final bool showListInGalley;
-  final bool showAppBar;
-  final bool closeWhenSwipeUp;
-  final bool closeWhenSwipeDown;
+  final bool showListInGallery;
+  final PreferredSizeWidget? appBar;
 
   const GalleryImageViewWrapper({
     Key? key,
-    required this.titleGallery,
-    required this.backgroundColor,
-    required this.initialIndex,
+    this.titleGallery,
+    this.backgroundColor,
+    this.initialIndex,
     required this.galleryItems,
-    required this.loadingWidget,
-    required this.errorWidget,
-    required this.minScale,
-    required this.maxScale,
+    this.loadingWidget,
+    this.errorWidget,
     required this.radius,
     required this.reverse,
-    required this.showListInGalley,
-    required this.showAppBar,
-    required this.closeWhenSwipeUp,
-    required this.closeWhenSwipeDown,
+    required this.showListInGallery,
+    this.appBar
   }) : super(key: key);
 
   @override
@@ -45,8 +39,7 @@ class GalleryImageViewWrapper extends StatefulWidget {
 }
 
 class _GalleryImageViewWrapperState extends State<GalleryImageViewWrapper> {
-  late final PageController _controller =
-      PageController(initialPage: widget.initialIndex ?? 0);
+  late final PageController _controller = PageController(initialPage: widget.initialIndex ?? 0);
   int _currentPage = 0;
 
   @override
@@ -69,50 +62,30 @@ class _GalleryImageViewWrapperState extends State<GalleryImageViewWrapper> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: widget.showAppBar
-          ? AppBar(
-              title: Text(widget.titleGallery ?? "Gallery"),
-            )
-          : null,
+      appBar: widget.appBar,
       backgroundColor: widget.backgroundColor,
       body: SafeArea(
         child: Container(
-          constraints:
-              BoxConstraints.expand(height: MediaQuery.of(context).size.height),
+          constraints: BoxConstraints.expand(height: MediaQuery.of(context).size.height),
           child: Column(
             children: [
               Expanded(
-                child: GestureDetector(
-                  onVerticalDragEnd: (details) {
-                    if (widget.closeWhenSwipeUp &&
-                        details.primaryVelocity! < 0) {
-                      //'up'
-                      Navigator.of(context).pop();
-                    }
-                    if (widget.closeWhenSwipeDown &&
-                        details.primaryVelocity! > 0) {
-                      // 'down'
-                      Navigator.of(context).pop();
-                    }
-                  },
+
                   child: PageView.builder(
                     reverse: widget.reverse,
                     controller: _controller,
                     itemCount: widget.galleryItems.length,
-                    itemBuilder: (context, index) =>
-                        _buildImage(widget.galleryItems[index]),
+                    itemBuilder: (context, index) => _buildImage(widget.galleryItems[index]),
                   ),
                 ),
-              ),
-              if (widget.showListInGalley)
+
+              if (widget.showListInGallery)
                 SizedBox(
                   height: 80,
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                      children: widget.galleryItems
-                          .map((e) => _buildLitImage(e))
-                          .toList(),
+                      children: widget.galleryItems.map((e) => _buildLitImage(e)).toList(),
                     ),
                   ),
                 ),
@@ -127,17 +100,16 @@ class _GalleryImageViewWrapperState extends State<GalleryImageViewWrapper> {
   Widget _buildImage(GalleryItemModel item) {
     return Hero(
       tag: item.id,
-      child: InteractiveViewer(
-        minScale: widget.minScale,
-        maxScale: widget.maxScale,
-        child: Center(
-          child: AppCachedNetworkImage(
-            imageUrl: item.imageUrl,
-            loadingWidget: widget.loadingWidget,
-            errorWidget: widget.errorWidget,
-            radius: widget.radius,
-          ),
-        ),
+      child: PhotoView(
+        onScaleEnd: (context, details, controllerValue) => print(controllerValue.scale),
+        minScale: PhotoViewComputedScale.contained,
+        errorBuilder: (context, error, stackTrace) {
+          return widget.errorWidget ?? const SizedBox.shrink();
+        },
+        loadingBuilder: (context, event) {
+          return widget.loadingWidget ?? const SizedBox.shrink();
+        },
+        imageProvider: CachedNetworkImageProvider(item.imageUrl),
       ),
     );
   }
