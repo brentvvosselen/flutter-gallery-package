@@ -17,6 +17,7 @@ class GalleryImageViewWrapper extends StatefulWidget {
   final bool reverse;
   final bool showListInGallery;
   final PreferredSizeWidget? appBar;
+  final bool displayBehindAppBar;
 
   const GalleryImageViewWrapper({
     Key? key,
@@ -29,7 +30,8 @@ class GalleryImageViewWrapper extends StatefulWidget {
     required this.radius,
     required this.reverse,
     required this.showListInGallery,
-    this.appBar
+    this.appBar,
+    required this.displayBehindAppBar,
   }) : super(key: key);
 
   @override
@@ -64,7 +66,9 @@ class _GalleryImageViewWrapperState extends State<GalleryImageViewWrapper> {
     return Scaffold(
       appBar: widget.appBar,
       backgroundColor: widget.backgroundColor,
+      extendBodyBehindAppBar: widget.displayBehindAppBar,
       body: SafeArea(
+        top: !widget.displayBehindAppBar,
         child: Container(
           constraints: BoxConstraints.expand(height: MediaQuery.of(context).size.height),
           child: Column(

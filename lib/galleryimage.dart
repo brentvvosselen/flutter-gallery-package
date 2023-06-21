@@ -147,6 +147,7 @@ class _GalleryImageState extends State<GalleryImage> {
       MaterialPageRoute(
         builder: (context) => GalleryImageViewWrapper(
           titleGallery: widget.titleGallery,
+          displayBehindAppBar: false,
           galleryItems: galleryItems,
           backgroundColor: widget.galleryBackgroundColor,
           initialIndex: indexOfImage,
