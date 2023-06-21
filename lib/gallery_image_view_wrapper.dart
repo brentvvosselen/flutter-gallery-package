@@ -42,11 +42,10 @@ class GalleryImageViewWrapper extends StatefulWidget {
 
 class _GalleryImageViewWrapperState extends State<GalleryImageViewWrapper> {
   late final PageController _controller = PageController(initialPage: widget.initialIndex ?? 0);
-  int _currentPage = 0;
+  late int _currentPage = widget.initialIndex ?? 0;
 
   @override
   void initState() {
-    _currentPage = 0;
     _controller.addListener(() {
       setState(() {
         _currentPage = _controller.page?.toInt() ?? 0;
