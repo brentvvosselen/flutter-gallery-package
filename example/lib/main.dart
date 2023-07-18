@@ -41,6 +41,7 @@ class MyHomePage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: GalleryImage(
+                  closeWhenSwipeDown: true,
                   numOfShowImages: 6,
                   imageUrls: const [
                     "https://cosmosmagazine.com/wp-content/uploads/2020/02/191010_nature.jpg",

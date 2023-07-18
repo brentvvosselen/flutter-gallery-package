@@ -156,6 +156,10 @@ class _GalleryImageState extends State<GalleryImage> {
           reverse: widget.reverse,
           showListInGallery: widget.showListInGalley,
           radius: widget.imageRadius,
+          closeWhenSwipeDown: widget.closeWhenSwipeDown,
+          closeWhenSwipeUp: widget.closeWhenSwipeUp,
+          maxScale: widget.maxScale,
+          minScale: widget.minScale,
         ),
       ),
     );

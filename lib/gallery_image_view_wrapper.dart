@@ -18,6 +18,10 @@ class GalleryImageViewWrapper extends StatefulWidget {
   final bool showListInGallery;
   final PreferredSizeWidget? appBar;
   final bool displayBehindAppBar;
+  final bool closeWhenSwipeUp;
+  final bool closeWhenSwipeDown;
+  final double? minScale;
+  final double? maxScale;
 
   const GalleryImageViewWrapper({
     Key? key,
@@ -32,6 +36,10 @@ class GalleryImageViewWrapper extends StatefulWidget {
     required this.showListInGallery,
     this.appBar,
     required this.displayBehindAppBar,
+    this.closeWhenSwipeUp = false,
+    this.closeWhenSwipeDown = false,
+    this.minScale,
+    this.maxScale,
   }) : super(key: key);
 
   @override
@@ -43,6 +51,8 @@ class GalleryImageViewWrapper extends StatefulWidget {
 class _GalleryImageViewWrapperState extends State<GalleryImageViewWrapper> {
   late final PageController _controller = PageController(initialPage: widget.initialIndex ?? 0);
   late int _currentPage = widget.initialIndex ?? 0;
+
+  bool isZooming = false;
 
   @override
   void initState() {
@@ -73,15 +83,26 @@ class _GalleryImageViewWrapperState extends State<GalleryImageViewWrapper> {
           child: Column(
             children: [
               Expanded(
-
+                child: GestureDetector(
+                  onVerticalDragEnd: (details) {
+                    if (widget.closeWhenSwipeUp && details.primaryVelocity! < 0) {
+                      //'up'
+                      Navigator.of(context).pop();
+                    }
+                    if (widget.closeWhenSwipeDown && details.primaryVelocity! > 0) {
+                      // 'down'
+                      Navigator.of(context).pop();
+                    }
+                  },
                   child: PageView.builder(
+                    physics: isZooming ? const NeverScrollableScrollPhysics() : null,
                     reverse: widget.reverse,
                     controller: _controller,
                     itemCount: widget.galleryItems.length,
                     itemBuilder: (context, index) => _buildImage(widget.galleryItems[index]),
                   ),
                 ),
-
+              ),
               if (widget.showListInGallery)
                 SizedBox(
                   height: 80,
@@ -104,8 +125,13 @@ class _GalleryImageViewWrapperState extends State<GalleryImageViewWrapper> {
     return Hero(
       tag: item.id,
       child: PhotoView(
-        onScaleEnd: (context, details, controllerValue) => print(controllerValue.scale),
-        minScale: PhotoViewComputedScale.contained,
+        scaleStateChangedCallback: (x) {
+          setState(() {
+            isZooming = x.isScaleStateZooming;
+          });
+        },
+        minScale: widget.minScale ?? PhotoViewComputedScale.contained,
+        maxScale: widget.maxScale,
         errorBuilder: (context, error, stackTrace) {
           return widget.errorWidget ?? const SizedBox.shrink();
         },
