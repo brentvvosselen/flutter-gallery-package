@@ -49,7 +49,10 @@ class GalleryImageViewWrapper extends StatefulWidget {
 }
 
 class _GalleryImageViewWrapperState extends State<GalleryImageViewWrapper> {
+  final PhotoViewScaleStateController _scaleStateController = PhotoViewScaleStateController();
+
   late final PageController _controller = PageController(initialPage: widget.initialIndex ?? 0);
+
   late int _currentPage = widget.initialIndex ?? 0;
 
   bool isZooming = false;
@@ -61,12 +64,20 @@ class _GalleryImageViewWrapperState extends State<GalleryImageViewWrapper> {
         _currentPage = _controller.page?.toInt() ?? 0;
       });
     });
+
+    _scaleStateController.outputScaleStateStream.listen((event) {
+      setState(() {
+        isZooming = event != PhotoViewScaleState.initial;
+      });
+    });
+
     super.initState();
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _scaleStateController.dispose();
     super.dispose();
   }
 
@@ -125,13 +136,9 @@ class _GalleryImageViewWrapperState extends State<GalleryImageViewWrapper> {
     return Hero(
       tag: item.id,
       child: PhotoView(
-        scaleStateChangedCallback: (x) {
-          setState(() {
-            isZooming = x.isScaleStateZooming;
-          });
-        },
         minScale: widget.minScale ?? PhotoViewComputedScale.contained,
         maxScale: widget.maxScale,
+        scaleStateController: _scaleStateController,
         errorBuilder: (context, error, stackTrace) {
           return widget.errorWidget ?? const SizedBox.shrink();
         },
