@@ -21,8 +21,8 @@ class GalleryImage extends StatefulWidget {
   final TextStyle? textStyleOfNumberWidget;
   final Widget? loadingWidget;
   final Widget? errorWidget;
-  final double minScale;
-  final double maxScale;
+  final double? minScale;
+  final double? maxScale;
   final double imageRadius;
   final bool reverse;
   final bool showListInGalley;

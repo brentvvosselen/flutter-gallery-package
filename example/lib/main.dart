@@ -41,6 +41,8 @@ class MyHomePage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: GalleryImage(
+                  maxScale: null,
+                  minScale: null,
                   closeWhenSwipeDown: true,
                   numOfShowImages: 6,
                   imageUrls: const [

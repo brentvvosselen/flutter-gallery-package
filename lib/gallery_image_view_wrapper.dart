@@ -61,7 +61,8 @@ class _GalleryImageViewWrapperState extends State<GalleryImageViewWrapper> {
   void initState() {
     _controller.addListener(() {
       setState(() {
-        _currentPage = _controller.page?.toInt() ?? 0;
+        // When a certain page is visible for more than 50%, we act like that's the current page.
+        _currentPage = (_controller.offset / _controller.position.viewportDimension).round();
       });
     });
 
